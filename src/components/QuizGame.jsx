@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuizStore } from '../store/quizStore';
 import { useAuthStore } from '../store/authStore';
 
@@ -15,49 +15,34 @@ export function QuizGame({ onBack }) {
   const { getQuizById, saveAnswer } = useQuizStore();
   const { user } = useAuthStore();
 
-  const handleJoinSession = async () => {
-    if (!sessionId.trim()) {
-      alert('Ingresa un ID de sesión válido');
-      return;
-    }
+  const inputStyle = {
+    background: '#0A0A0A',
+    border: '1px solid rgba(180,249,83,0.25)',
+    color: '#F7F7F7',
+    fontFamily: "'JetBrains Mono', monospace",
+    outline: 'none',
+  };
 
+  const handleJoinSession = async () => {
+    if (!sessionId.trim()) { alert('ERROR: Ingresa un ID valido'); return; }
     setLoading(true);
     try {
       const quiz = await getQuizById(sessionId);
-      if (quiz) {
-        setCurrentQuiz(quiz);
-      } else {
-        alert('Quiz no encontrado');
-      }
+      if (quiz) { setCurrentQuiz(quiz); } else { alert('ERROR: Quiz not found'); }
     } catch (error) {
       console.error('Error joining session:', error);
-      alert('Error al unirse a la sesión');
-    } finally {
-      setLoading(false);
-    }
+      alert('ERROR: Connection failed');
+    } finally { setLoading(false); }
   };
 
   const handleAnswer = (answerIndex) => {
     if (answered) return;
-
     setSelectedAnswer(answerIndex);
     const question = currentQuiz.questions[currentQuestionIndex];
     const isCorrect = answerIndex === question.correct;
-
-    if (isCorrect) {
-      setScore(score + 1);
-    }
-
+    if (isCorrect) setScore(score + 1);
     setAnswered(true);
-
-    // Guardar respuesta en Nostr
-    saveAnswer({
-      quizId: currentQuiz.id,
-      questionId: question.id,
-      answer: answerIndex,
-      correct: isCorrect,
-      player: user.pubkey
-    });
+    saveAnswer({ quizId: currentQuiz.id, questionId: question.id, answer: answerIndex, correct: isCorrect, player: user.pubkey });
   };
 
   const handleNextQuestion = () => {
@@ -65,171 +50,108 @@ export function QuizGame({ onBack }) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer(null);
       setAnswered(false);
-    } else {
-      setGameFinished(true);
-    }
+    } else { setGameFinished(true); }
   };
 
-  // Session Join View
   if (!currentQuiz) {
     return (
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto space-y-5">
         <div className="flex justify-between items-center">
-          <h2 className="text-3xl font-bold text-white">🎮 Jugar Quiz</h2>
-          <button
-            onClick={onBack}
-            className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white transition"
-          >
-            ← Volver
-          </button>
-        </div>
-
-        <div className="bg-black/40 backdrop-blur-md border border-purple-500/20 rounded-xl p-8 space-y-6">
-          <div className="text-center space-y-2">
-            <p className="text-purple-300">Ingresa el ID del quiz o escanea el código QR compartido</p>
+          <div>
+            <h2 className="text-xl font-bold font-mono tracking-widest uppercase" style={{ color: '#F7931A', textShadow: '0 0 6px rgba(247,147,26,0.5)' }}>&gt; JOIN_SESSION</h2>
+            <p className="text-xs font-mono text-gray-600">[ ENTER QUIZ ID TO CONNECT ]</p>
           </div>
-
+          <button onClick={onBack} className="px-4 py-2 font-mono text-xs tracking-widest uppercase" style={{ border: '1px solid rgba(180,249,83,0.3)', background: '#0A0A0A', color: '#B4F953' }}>&larr; BACK</button>
+        </div>
+        <div className="p-8 space-y-5" style={{ border: '1px solid rgba(247,147,26,0.3)', background: 'rgba(0,0,0,0.4)' }}>
           <div className="space-y-3">
-            <label className="block text-purple-300 font-semibold">ID de la Sesión</label>
-            <input
-              type="text"
-              value={sessionId}
-              onChange={(e) => setSessionId(e.target.value)}
-              placeholder="Ej: 1713000000000"
-              className="w-full bg-black/50 border border-purple-500/30 rounded-lg px-4 py-3 text-white focus:border-purple-500 outline-none text-lg"
-            />
-
-            <button
-              onClick={handleJoinSession}
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 disabled:opacity-50 text-white font-bold py-3 rounded-lg transition text-lg"
-            >
-              {loading ? '⏳ Conectando...' : '🔗 Unirse al Quiz'}
+            <label className="block text-xs font-mono font-bold uppercase tracking-widest" style={{ color: '#F7931A' }}>// SESSION ID</label>
+            <input type="text" value={sessionId} onChange={(e) => setSessionId(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleJoinSession()} placeholder="e.g. 1713000000000" className="w-full px-4 py-3 text-sm font-mono" style={inputStyle} />
+            <button onClick={handleJoinSession} disabled={loading} className="w-full py-4 font-mono font-bold text-sm tracking-widest uppercase transition-all disabled:opacity-50" style={{ border: '2px solid #F7931A', background: loading ? 'rgba(247,147,26,0.1)' : '#0A0A0A', color: '#F7931A' }}>
+              {loading ? 'CONNECTING...' : 'UNIRSE AL QUIZ'}
             </button>
           </div>
-
-          <div className="bg-blue-900/30 border border-blue-500/30 rounded-lg p-4">
-            <p className="text-blue-300 text-sm">
-              💡 Si alguien comparte un código QR contigo, escanéalo para obtener el ID automáticamente
-            </p>
+          <div className="p-3" style={{ border: '1px solid rgba(180,249,83,0.15)', background: 'rgba(180,249,83,0.03)' }}>
+            <p className="text-xs font-mono text-gray-500">&gt; Scan a shared QR code to get the quiz ID automatically.</p>
           </div>
         </div>
       </div>
     );
   }
 
-  // Game Finished View
   if (gameFinished) {
+    const pct = Math.round((score / currentQuiz.questions.length) * 100);
+    const grade = pct >= 80 ? 'S' : pct >= 60 ? 'A' : pct >= 40 ? 'B' : 'C';
     return (
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div className="bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl p-8 text-center space-y-4">
-          <p className="text-5xl">🎉</p>
-          <h2 className="text-3xl font-bold text-white">¡Quiz Completado!</h2>
-          <div className="bg-black/30 rounded-lg p-6">
-            <p className="text-6xl font-bold text-white">{score}/{currentQuiz.questions.length}</p>
-            <p className="text-green-200 mt-2">
-              {Math.round((score / currentQuiz.questions.length) * 100)}% Correcto
-            </p>
+      <div className="max-w-2xl mx-auto space-y-4">
+        <div className="p-8 text-center space-y-5" style={{ border: '2px solid #B4F953', background: '#0A0A0A' }}>
+          <p className="text-xs font-mono text-gray-500">[ SESSION COMPLETE ]</p>
+          <h2 className="text-3xl font-bold font-mono tracking-widest uppercase" style={{ color: '#B4F953', textShadow: '0 0 12px rgba(180,249,83,0.6)' }}>QUIZ TERMINADO</h2>
+          <div className="py-8 space-y-2" style={{ border: '1px solid rgba(180,249,83,0.2)', background: 'rgba(180,249,83,0.03)' }}>
+            <p className="text-7xl font-bold font-mono" style={{ color: '#F7931A', textShadow: '0 0 20px rgba(247,147,26,0.6)' }}>{score}/{currentQuiz.questions.length}</p>
+            <p className="text-sm font-mono text-gray-400">{pct}% CORRECTO</p>
+            <p className="text-2xl font-bold font-mono mt-2" style={{ color: '#B4F953' }}>GRADE: {grade}</p>
           </div>
-
-          <button
-            onClick={() => {
-              setCurrentQuiz(null);
-              setCurrentQuestionIndex(0);
-              setScore(0);
-              setGameFinished(false);
-              onBack();
-            }}
-            className="w-full bg-white hover:bg-gray-100 text-green-600 font-bold py-3 rounded-lg transition mt-4"
-          >
-            ← Volver al Dashboard
+          <button onClick={() => { setCurrentQuiz(null); setCurrentQuestionIndex(0); setScore(0); setGameFinished(false); onBack(); }} className="w-full py-4 font-mono font-bold text-sm tracking-widest uppercase" style={{ border: '2px solid #B4F953', background: '#0A0A0A', color: '#B4F953' }}>
+            &larr; VOLVER AL DASHBOARD
           </button>
         </div>
       </div>
     );
   }
 
-  // Game View
   const question = currentQuiz.questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / currentQuiz.questions.length) * 100;
+  const diffColor = question.difficulty === 'easy' ? '#B4F953' : question.difficulty === 'medium' ? '#F7931A' : '#FF4444';
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      {/* Header */}
+    <div className="max-w-2xl mx-auto space-y-5">
       <div className="flex justify-between items-start">
         <div>
-          <h2 className="text-3xl font-bold text-white">{currentQuiz.title}</h2>
-          <p className="text-purple-300 text-sm">{currentQuiz.description}</p>
+          <h2 className="text-lg font-bold font-mono uppercase tracking-wider" style={{ color: '#B4F953' }}>{currentQuiz.title}</h2>
+          <p className="text-xs font-mono text-gray-600">{currentQuiz.description}</p>
         </div>
-        <button
-          onClick={onBack}
-          className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white transition"
-        >
-          ✕ Salir
-        </button>
+        <button onClick={onBack} className="px-3 py-1 font-mono text-xs tracking-widest uppercase" style={{ border: '1px solid rgba(255,68,68,0.4)', background: '#0A0A0A', color: '#FF4444' }}>[X] EXIT</button>
       </div>
 
-      {/* Progress Bar */}
-      <div className="space-y-2">
-        <div className="flex justify-between items-center">
-          <span className="text-purple-300">Pregunta {currentQuestionIndex + 1}/{currentQuiz.questions.length}</span>
-          <span className="text-green-400 font-bold">Puntuación: {score}</span>
+      <div className="space-y-1">
+        <div className="flex justify-between items-center text-xs font-mono">
+          <span className="text-gray-500">Q {currentQuestionIndex + 1}/{currentQuiz.questions.length}</span>
+          <span style={{ color: '#F7931A' }} className="font-bold">SCORE: {score}</span>
         </div>
-        <div className="w-full bg-black/40 rounded-full h-2 border border-purple-500/20">
-          <div
-            className="bg-gradient-to-r from-purple-600 to-blue-600 h-full rounded-full transition-all"
-            style={{ width: `${progress}%` }}
-          ></div>
+        <div className="w-full h-1" style={{ background: 'rgba(180,249,83,0.1)' }}>
+          <div className="h-full transition-all duration-500" style={{ width: `${progress}%`, background: '#B4F953', boxShadow: '0 0 8px rgba(180,249,83,0.5)' }} />
         </div>
       </div>
 
-      {/* Question Card */}
-      <div className="bg-black/40 backdrop-blur-md border border-purple-500/20 rounded-xl p-8 space-y-6">
+      <div className="p-6 space-y-5" style={{ border: '1px solid rgba(180,249,83,0.25)', background: 'rgba(0,0,0,0.5)' }}>
         <div>
-          <p className="text-purple-400 text-sm mb-2">
-            Dificultad: <span className="capitalize font-semibold">{question.difficulty}</span>
-          </p>
-          <h3 className="text-2xl font-bold text-white">{question.question}</h3>
+          <p className="text-xs font-mono mb-2" style={{ color: diffColor }}>DIFFICULTY: [{question.difficulty.toUpperCase()}]</p>
+          <h3 className="text-lg font-bold font-mono text-white leading-snug">{question.question}</h3>
         </div>
-
-        {/* Answers */}
         <div className="space-y-3">
-          {question.answers.map((answer, idx) => (
-            <button
-              key={idx}
-              onClick={() => handleAnswer(idx)}
-              disabled={answered}
-              className={`w-full p-4 rounded-lg font-semibold text-left transition transform hover:scale-105 active:scale-95 disabled:hover:scale-100 ${
-                selectedAnswer === idx
-                  ? idx === question.correct
-                    ? 'bg-green-600 border-2 border-green-400 text-white'
-                    : 'bg-red-600 border-2 border-red-400 text-white'
-                  : answered && idx === question.correct
-                  ? 'bg-green-600/50 border-2 border-green-400 text-white'
-                  : 'bg-purple-600/20 border-2 border-purple-500/30 text-white hover:border-purple-500/60'
-              }`}
-            >
-              <span className="mr-3">
-                {answered
-                  ? idx === question.correct
-                    ? '✓'
-                    : selectedAnswer === idx
-                    ? '✕'
-                    : ''
-                  : '○'}
-              </span>
-              {answer}
-            </button>
-          ))}
+          {question.answers.map((answer, idx) => {
+            const isSelected = selectedAnswer === idx;
+            const isCorrect = idx === question.correct;
+            let borderColor = 'rgba(180,249,83,0.2)';
+            let bg = 'rgba(0,0,0,0)';
+            let color = '#F7F7F7';
+            let prefix = 'o';
+            if (answered) {
+              if (isCorrect) { borderColor = '#B4F953'; bg = 'rgba(180,249,83,0.1)'; color = '#B4F953'; prefix = 'V'; }
+              else if (isSelected && !isCorrect) { borderColor = '#FF4444'; bg = 'rgba(255,68,68,0.1)'; color = '#FF4444'; prefix = 'X'; }
+              else { borderColor = 'rgba(180,249,83,0.1)'; color = '#555'; }
+            }
+            return (
+              <button key={idx} onClick={() => handleAnswer(idx)} disabled={answered} className="w-full p-4 font-mono text-sm text-left transition-all disabled:cursor-default" style={{ border: `2px solid ${borderColor}`, background: bg, color }}>
+                <span style={{ color: '#F7931A', marginRight: '10px' }}>[{prefix}]</span>{answer}
+              </button>
+            );
+          })}
         </div>
-
-        {/* Next Button */}
         {answered && (
-          <button
-            onClick={handleNextQuestion}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 rounded-lg transition"
-          >
-            {currentQuestionIndex < currentQuiz.questions.length - 1 ? '→ Siguiente Pregunta' : '✓ Terminar Quiz'}
+          <button onClick={handleNextQuestion} className="w-full py-3 font-mono font-bold text-sm tracking-widest uppercase" style={{ border: '2px solid #F7931A', background: '#0A0A0A', color: '#F7931A' }}>
+            {currentQuestionIndex < currentQuiz.questions.length - 1 ? 'SIGUIENTE PREGUNTA' : 'TERMINAR QUIZ'}
           </button>
         )}
       </div>
