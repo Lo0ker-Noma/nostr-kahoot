@@ -15,24 +15,23 @@ export function QuizCreator({ onBack }) {
   const { createQuiz } = useQuizStore();
   const { pubkey } = useAuthStore();
 
+  const inputStyle = {
+    background: '#0A0A0A',
+    border: '1px solid rgba(180,249,83,0.25)',
+    color: '#F7F7F7',
+    fontFamily: "'JetBrains Mono', monospace",
+    outline: 'none',
+  };
+
   const addQuestion = () => {
     if (!currentQuestion.trim() || currentAnswers.some(a => !a.trim())) {
       alert('Por favor completa todos los campos');
       return;
     }
-
     setQuestions([
       ...questions,
-      {
-        id: Date.now(),
-        question: currentQuestion,
-        answers: currentAnswers,
-        correct: correctAnswerIndex,
-        difficulty: difficulty
-      }
+      { id: Date.now(), question: currentQuestion, answers: currentAnswers, correct: correctAnswerIndex, difficulty },
     ]);
-
-    // Reset
     setCurrentQuestion('');
     setCurrentAnswers(['', '', '', '']);
     setCorrectAnswerIndex(0);
@@ -44,162 +43,99 @@ export function QuizCreator({ onBack }) {
 
   const handlePublish = async () => {
     if (!title.trim() || questions.length === 0) {
-      alert('Necesitas título y al menos una pregunta');
+      alert('Necesitas titulo y al menos una pregunta');
       return;
     }
-
     setLoading(true);
     try {
-      await createQuiz({
-        title,
-        description,
-        questions,
-        creator: pubkey,
-        createdAt: new Date().toISOString(),
-        participants: 0
-      });
-      alert('¡Quiz publicado en Nostr! 🎉');
+      await createQuiz({ title, description, questions, creator: pubkey, createdAt: new Date().toISOString(), participants: 0 });
+      alert('Quiz publicado en Nostr');
       onBack();
     } catch (error) {
       console.error('Error publishing quiz:', error);
-      alert('Error al publicar el quiz');
+      alert('ERROR: Failed to publish quiz');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-5">
       <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold text-white">✏️ Crear Quiz</h2>
-        <button
-          onClick={onBack}
-          className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white transition"
-        >
-          ← Volver
+        <div>
+          <h2 className="text-xl font-bold font-mono tracking-widest uppercase" style={{ color: '#B4F953', textShadow: '0 0 6px rgba(180,249,83,0.5)' }}>
+            &gt; QUIZ_CREATOR
+          </h2>
+          <p className="text-xs font-mono text-gray-600">[ BROADCAST TO NOSTR RELAY ]</p>
+        </div>
+        <button onClick={onBack} className="px-4 py-2 font-mono text-xs tracking-widest uppercase transition-all" style={{ border: '1px solid rgba(180,249,83,0.3)', background: '#0A0A0A', color: '#B4F953' }}>
+          &larr; BACK
         </button>
       </div>
 
-      {/* Quiz Info */}
-      <div className="bg-black/40 backdrop-blur-md border border-purple-500/20 rounded-xl p-6 space-y-4">
+      <div className="p-5 space-y-4" style={{ border: '1px solid rgba(180,249,83,0.2)', background: 'rgba(0,0,0,0.4)' }}>
+        <p className="text-xs font-mono text-gray-500">&#9654; QUIZ_METADATA</p>
         <div>
-          <label className="block text-purple-300 font-semibold mb-2">Título del Quiz</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Ej: Conceptos de Nostr"
-            className="w-full bg-black/50 border border-purple-500/30 rounded-lg px-4 py-2 text-white focus:border-purple-500 outline-none"
-          />
+          <label className="block text-xs font-mono font-bold mb-2 uppercase tracking-widest" style={{ color: '#F7931A' }}>// TITULO</label>
+          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. NOSTR FUNDAMENTALS" className="w-full px-4 py-2 text-sm font-mono" style={inputStyle} />
         </div>
-
         <div>
-          <label className="block text-purple-300 font-semibold mb-2">Descripción</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe tu quiz..."
-            className="w-full bg-black/50 border border-purple-500/30 rounded-lg px-4 py-2 text-white focus:border-purple-500 outline-none h-20 resize-none"
-          />
+          <label className="block text-xs font-mono font-bold mb-2 uppercase tracking-widest" style={{ color: '#F7931A' }}>// DESCRIPCION</label>
+          <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe tu quiz..." className="w-full px-4 py-2 text-sm font-mono h-20 resize-none" style={inputStyle} />
         </div>
       </div>
 
-      {/* Question Creator */}
-      <div className="bg-black/40 backdrop-blur-md border border-purple-500/20 rounded-xl p-6 space-y-4">
-        <h3 className="text-xl font-bold text-white">Agregar Pregunta ({questions.length})</h3>
-
+      <div className="p-5 space-y-4" style={{ border: '1px solid rgba(180,249,83,0.2)', background: 'rgba(0,0,0,0.4)' }}>
+        <p className="text-xs font-mono text-gray-500">&#9654; ADD_QUESTION [ {questions.length} ADDED ]</p>
         <div>
-          <label className="block text-purple-300 font-semibold mb-2">Pregunta</label>
-          <input
-            type="text"
-            value={currentQuestion}
-            onChange={(e) => setCurrentQuestion(e.target.value)}
-            placeholder="¿Cuál es tu pregunta?"
-            className="w-full bg-black/50 border border-purple-500/30 rounded-lg px-4 py-2 text-white focus:border-purple-500 outline-none"
-          />
+          <label className="block text-xs font-mono font-bold mb-2 uppercase tracking-widest" style={{ color: '#F7931A' }}>// PREGUNTA</label>
+          <input type="text" value={currentQuestion} onChange={(e) => setCurrentQuestion(e.target.value)} placeholder="Que es un relay de Nostr?" className="w-full px-4 py-2 text-sm font-mono" style={inputStyle} />
         </div>
-
         <div>
-          <label className="block text-purple-300 font-semibold mb-2">Dificultad</label>
-          <select
-            value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value)}
-            className="w-full bg-black/50 border border-purple-500/30 rounded-lg px-4 py-2 text-white focus:border-purple-500 outline-none"
-          >
-            <option value="easy">Fácil</option>
-            <option value="medium">Medio</option>
-            <option value="hard">Difícil</option>
+          <label className="block text-xs font-mono font-bold mb-2 uppercase tracking-widest" style={{ color: '#F7931A' }}>// DIFICULTAD</label>
+          <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} className="w-full px-4 py-2 text-sm font-mono" style={inputStyle}>
+            <option value="easy">[ EASY ]</option>
+            <option value="medium">[ MEDIUM ]</option>
+            <option value="hard">[ HARD ]</option>
           </select>
         </div>
-
         <div>
-          <label className="block text-purple-300 font-semibold mb-2">Respuestas</label>
+          <label className="block text-xs font-mono font-bold mb-2 uppercase tracking-widest" style={{ color: '#F7931A' }}>// RESPUESTAS</label>
           <div className="space-y-2">
             {currentAnswers.map((answer, idx) => (
-              <div key={idx} className="flex gap-2">
-                <input
-                  type="radio"
-                  name="correct"
-                  checked={correctAnswerIndex === idx}
-                  onChange={() => setCorrectAnswerIndex(idx)}
-                  className="mt-3"
-                />
-                <input
-                  type="text"
-                  value={answer}
-                  onChange={(e) => {
-                    const newAnswers = [...currentAnswers];
-                    newAnswers[idx] = e.target.value;
-                    setCurrentAnswers(newAnswers);
-                  }}
-                  placeholder={`Opción ${idx + 1}`}
-                  className="flex-1 bg-black/50 border border-purple-500/30 rounded-lg px-4 py-2 text-white focus:border-purple-500 outline-none"
-                />
+              <div key={idx} className="flex gap-3 items-center">
+                <button type="button" onClick={() => setCorrectAnswerIndex(idx)} className="w-5 h-5 font-mono text-xs flex items-center justify-center flex-shrink-0 transition-all" style={{ border: correctAnswerIndex === idx ? '2px solid #B4F953' : '2px solid rgba(180,249,83,0.3)', background: correctAnswerIndex === idx ? '#B4F953' : 'transparent', color: correctAnswerIndex === idx ? '#0A0A0A' : '#B4F953' }}>
+                  {correctAnswerIndex === idx ? '&#10003;' : ''}
+                </button>
+                <input type="text" value={answer} onChange={(e) => { const n = [...currentAnswers]; n[idx] = e.target.value; setCurrentAnswers(n); }} placeholder={`OPCION ${idx + 1}`} className="flex-1 px-4 py-2 text-sm font-mono" style={{ ...inputStyle, borderColor: correctAnswerIndex === idx ? 'rgba(180,249,83,0.5)' : 'rgba(180,249,83,0.2)' }} />
               </div>
             ))}
           </div>
-          <p className="text-purple-400 text-xs mt-2">Selecciona el radio button para marcar la respuesta correcta</p>
         </div>
-
-        <button
-          onClick={addQuestion}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition"
-        >
-          ➕ Agregar Pregunta
+        <button onClick={addQuestion} className="w-full py-3 font-mono font-bold text-sm tracking-widest uppercase transition-all" style={{ border: '2px solid rgba(247,147,26,0.6)', background: '#0A0A0A', color: '#F7931A' }}>
+          + AGREGAR PREGUNTA
         </button>
       </div>
 
-      {/* Questions List */}
       {questions.length > 0 && (
-        <div className="bg-black/40 backdrop-blur-md border border-purple-500/20 rounded-xl p-6 space-y-4">
-          <h3 className="text-xl font-bold text-white">Preguntas Añadidas</h3>
-          <div className="space-y-3 max-h-96 overflow-y-auto">
+        <div className="p-5 space-y-3" style={{ border: '1px solid rgba(180,249,83,0.2)', background: 'rgba(0,0,0,0.4)' }}>
+          <p className="text-xs font-mono text-gray-500">&#9654; QUESTION_STACK [ {questions.length} ]</p>
+          <div className="space-y-2 max-h-72 overflow-y-auto">
             {questions.map((q, idx) => (
-              <div key={q.id} className="bg-purple-600/20 border border-purple-500/30 rounded-lg p-3">
-                <div className="flex justify-between items-start mb-2">
-                  <p className="font-semibold text-white">{idx + 1}. {q.question}</p>
-                  <button
-                    onClick={() => removeQuestion(q.id)}
-                    className="text-red-400 hover:text-red-300 text-sm"
-                  >
-                    ✕
-                  </button>
+              <div key={q.id} className="p-3 flex justify-between items-start" style={{ border: '1px solid rgba(180,249,83,0.2)', background: 'rgba(180,249,83,0.03)' }}>
+                <div className="flex-1 min-w-0">
+                  <p className="font-mono text-sm text-white font-bold"><span style={{ color: '#F7931A' }}>#{idx + 1}</span> {q.question}</p>
+                  <p className="text-xs font-mono text-gray-600 mt-1">DIFF: [{q.difficulty.toUpperCase()}] | ANS: {q.answers[q.correct]}</p>
                 </div>
-                <p className="text-purple-300 text-xs mb-1">Dificultad: {q.difficulty}</p>
-                <p className="text-purple-300 text-xs">Respuesta correcta: {q.answers[q.correct]}</p>
+                <button onClick={() => removeQuestion(q.id)} className="ml-3 text-red-500 hover:text-red-400 font-mono text-xs flex-shrink-0">[X]</button>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Publish Button */}
-      <button
-        onClick={handlePublish}
-        disabled={loading || !title || questions.length === 0}
-        className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 text-white font-bold py-3 rounded-lg transition text-lg"
-      >
-        {loading ? '⏳ Publicando en Nostr...' : '🚀 Publicar Quiz en Nostr'}
+      <button onClick={handlePublish} disabled={loading || !title || questions.length === 0} className="w-full py-4 font-mono font-bold text-sm tracking-widest uppercase transition-all disabled:opacity-30" style={{ border: '2px solid #B4F953', background: loading ? 'rgba(180,249,83,0.15)' : '#0A0A0A', color: '#B4F953' }}>
+        {loading ? '&#9654; BROADCASTING TO NOSTR...' : '&#9889; PUBLICAR QUIZ EN NOSTR'}
       </button>
     </div>
   );
