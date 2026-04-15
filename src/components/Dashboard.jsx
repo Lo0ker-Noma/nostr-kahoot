@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuizStore } from '../store/quizStore';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG as QRCode } from 'qrcode.react';
 
 export function Dashboard({ onCreateClick, onGameClick }) {
   const { quizzes, loadQuizzesFromNostr } = useQuizStore();
