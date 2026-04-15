@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { getPublicKey, finalizeEvent } from 'nostr-tools';
+import { getPublicKey } from 'nostr-tools';
 
 export const useAuthStore = create((set, get) => ({
   isAuthenticated: false,
