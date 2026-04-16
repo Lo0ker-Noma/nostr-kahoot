@@ -1,6 +1,26 @@
 import { create } from 'zustand';
 import { useAuthStore } from './authStore';
 
+// Fisher-Yates shuffle of quiz answers — correct index follows its answer
+export function shuffleQuiz(quiz) {
+  if (!quiz) return quiz;
+  return {
+    ...quiz,
+    questions: quiz.questions.map((q) => {
+      const indices = [0, 1, 2, 3].slice(0, q.answers.length);
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+      }
+      return {
+        ...q,
+        answers: indices.map((i) => q.answers[i]),
+        correct: indices.indexOf(q.correct),
+      };
+    }),
+  };
+}
+
 const DEMO_QUIZZES = [
   {
     id: 'quiz-nostr-identity',

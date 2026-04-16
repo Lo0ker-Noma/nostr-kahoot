@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { generateSecretKey, getPublicKey, finalizeEvent } from 'nostr-tools';
 import { getRelay } from '../lib/nostrRelay';
 import { useAuthStore } from './authStore';
+import { shuffleQuiz } from './quizStore';
 
 const GAME_KIND = 30078;
 export const POINTS_PER_CORRECT = 21;
@@ -30,9 +31,10 @@ export const useGameStore = create((set, get) => ({
   currentQuestion: null,
   questionStartTime: null,
 
-  createSession: async (quiz) => {
+  createSession: async (rawQuiz) => {
     const { signEvent, pubkey, isReadOnly } = useAuthStore.getState();
     if (isReadOnly) return null;
+    const quiz = shuffleQuiz(rawQuiz);
     const pin = generatePin();
     const relay = getRelay();
     const event = {

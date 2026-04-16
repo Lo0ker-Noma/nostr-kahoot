@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useQuizStore } from '../store/quizStore';
+import { useQuizStore, shuffleQuiz } from '../store/quizStore';
 import { useAuthStore } from '../store/authStore';
 
 export function QuizGame({ onBack, initialQuizId, initialQuiz }) {
   const [sessionId, setSessionId] = useState('');
-  const [currentQuiz, setCurrentQuiz] = useState(initialQuiz || null);
+  const [currentQuiz, setCurrentQuiz] = useState(initialQuiz ? shuffleQuiz(initialQuiz) : null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [score, setScore] = useState(0);
@@ -28,7 +28,7 @@ export function QuizGame({ onBack, initialQuizId, initialQuiz }) {
     setLoading(true);
     try {
       const quiz = await getQuizById(sessionId);
-      if (quiz) { setCurrentQuiz(quiz); } else { alert('ERROR: Quiz not found'); }
+      if (quiz) { setCurrentQuiz(shuffleQuiz(quiz)); } else { alert('ERROR: Quiz not found'); }
     } catch (error) {
       console.error('Error joining session:', error);
       alert('ERROR: Connection failed');

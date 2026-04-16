@@ -15,6 +15,12 @@ html, body, #root {
   height: 100%;
 }
 
+/* ── Animated grid background ── */
+@keyframes gridScroll {
+  0%   { background-position: 0 0, 0 0, 0 0, 0 0; }
+  100% { background-position: 40px 40px, 40px 40px, 80px 80px, 80px 80px; }
+}
+
 body {
   font-family: 'JetBrains Mono', 'Space Mono', monospace;
   -webkit-font-smoothing: antialiased;
@@ -22,12 +28,13 @@ body {
   background: #0A0A0A;
   color: #F7F7F7;
   background-image:
-    linear-gradient(0deg, rgba(180, 249, 83, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(180, 249, 83, 0.05) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(247, 147, 26, 0.02) 2px, transparent 2px),
-    linear-gradient(90deg, rgba(247, 147, 26, 0.02) 2px, transparent 2px);
+    linear-gradient(0deg,  rgba(180, 249, 83, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180, 249, 83, 0.06) 1px, transparent 1px),
+    linear-gradient(0deg,  rgba(247, 147, 26, 0.025) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(247, 147, 26, 0.025) 2px, transparent 2px);
   background-size: 40px 40px, 40px 40px, 80px 80px, 80px 80px;
   background-position: 0 0, 0 0, 0 0, 0 0;
+  animation: gridScroll 12s linear infinite;
   position: relative;
 }
 
@@ -39,9 +46,9 @@ body::before {
   width: 100%;
   height: 100%;
   background: linear-gradient(180deg,
-    rgba(247, 147, 26, 0.03) 0%,
+    rgba(247, 147, 26, 0.04) 0%,
     transparent 50%,
-    rgba(180, 249, 83, 0.02) 100%);
+    rgba(180, 249, 83, 0.03) 100%);
   pointer-events: none;
   z-index: -1;
 }
@@ -51,61 +58,215 @@ code {
   font-weight: 600;
 }
 
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #0A0A0A; border-left: 1px solid rgba(180, 249, 83, 0.1); }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #F7931A, #B4F953); border: 1px solid #B4F953; }
+::-webkit-scrollbar-thumb:hover { box-shadow: 0 0 10px rgba(180, 249, 83, 0.5); }
 
-::-webkit-scrollbar-track {
-  background: #0A0A0A;
-  border-left: 1px solid rgba(180, 249, 83, 0.1);
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #F7931A, #B4F953);
-  border: 1px solid #B4F953;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #F7931A, #B4F953);
-  box-shadow: 0 0 10px rgba(180, 249, 83, 0.5);
-}
-
+/* ── Base keyframes ── */
 @keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 @keyframes glow {
-  0%, 100% {
-    text-shadow: 0 0 5px rgba(180, 249, 83, 0.5), 0 0 10px rgba(247, 147, 26, 0.3);
-  }
-  50% {
-    text-shadow: 0 0 10px rgba(180, 249, 83, 0.8), 0 0 20px rgba(247, 147, 26, 0.5);
-  }
+  0%, 100% { text-shadow: 0 0 5px rgba(180, 249, 83, 0.5), 0 0 10px rgba(247, 147, 26, 0.3); }
+  50%       { text-shadow: 0 0 10px rgba(180, 249, 83, 0.8), 0 0 20px rgba(247, 147, 26, 0.5); }
 }
 
 @keyframes scanline {
-  0% {
-    transform: translateY(0);
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(10px); }
+}
+
+/* ── Neon lightning bolt ── */
+@keyframes neonBolt {
+  0%, 100% {
+    color: #FFB830;
+    text-shadow:
+      0 0 4px #F7931A,
+      0 0 10px #F7931A,
+      0 0 22px #F7931A,
+      0 0 42px rgba(247,147,26,0.7);
   }
-  100% {
-    transform: translateY(10px);
+  40% {
+    color: #FFE566;
+    text-shadow:
+      0 0 6px #F7931A,
+      0 0 18px #F7931A,
+      0 0 38px #F7931A,
+      0 0 70px rgba(247,147,26,0.5),
+      0 0 110px rgba(247,147,26,0.25);
+  }
+  42% {
+    /* micro-flicker */
+    color: #fff;
+    text-shadow: 0 0 2px #fff, 0 0 8px #F7931A;
+  }
+  44% {
+    color: #FFE566;
+    text-shadow:
+      0 0 6px #F7931A,
+      0 0 18px #F7931A,
+      0 0 40px #F7931A,
+      0 0 75px rgba(247,147,26,0.5);
   }
 }
 
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.neon-bolt {
+  display: inline-block;
+  animation: neonBolt 2.2s ease-in-out infinite;
 }
 
-.animate-glow {
-  animation: glow 3s ease-in-out infinite;
+/* ── Glitch text effect ── */
+@keyframes glitchBefore {
+  0%, 88%, 100% { opacity: 0; transform: translate(0); }
+  89% { opacity: 1; clip-path: polygon(0 20%, 100% 20%, 100% 38%, 0 38%); transform: translate(-4px, 1px); color: #F7931A; }
+  91% { opacity: 1; clip-path: polygon(0 62%, 100% 62%, 100% 78%, 0 78%); transform: translate(-2px, -1px); color: #F7931A; }
+  93% { opacity: 0; }
 }
 
+@keyframes glitchAfter {
+  0%, 90%, 100% { opacity: 0; transform: translate(0); }
+  91% { opacity: 1; clip-path: polygon(0 44%, 100% 44%, 100% 58%, 0 58%); transform: translate(4px, 0); color: #4FC3F7; }
+  93% { opacity: 1; clip-path: polygon(0 10%, 100% 10%, 100% 25%, 0 25%); transform: translate(2px, 1px); color: #4FC3F7; }
+  95% { opacity: 0; }
+}
+
+.glitch-text {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  font: inherit;
+  pointer-events: none;
+}
+
+.glitch-text::before {
+  animation: glitchBefore 5s infinite;
+  color: #F7931A;
+}
+
+.glitch-text::after {
+  animation: glitchAfter 5s infinite;
+  color: #4FC3F7;
+}
+
+/* ── Glitch for large digit displays (PIN) ── */
+@keyframes digitGlitch {
+  0%, 93%, 100% {
+    transform: none;
+    text-shadow: 0 0 12px rgba(180, 249, 83, 0.7), 0 0 30px rgba(180, 249, 83, 0.3);
+    letter-spacing: 0.3em;
+  }
+  94% {
+    transform: skewX(-8deg) translate(-3px, 0);
+    text-shadow: -3px 0 #F7931A, 3px 0 #4FC3F7, 0 0 12px rgba(180,249,83,0.5);
+    letter-spacing: 0.25em;
+  }
+  96% {
+    transform: skewX(5deg) translate(3px, 0);
+    text-shadow: 3px 0 #F7931A, -3px 0 #4FC3F7;
+    letter-spacing: 0.35em;
+  }
+  98% {
+    transform: translate(0, -2px);
+    text-shadow: 0 0 12px rgba(180, 249, 83, 0.7);
+    letter-spacing: 0.3em;
+  }
+}
+
+.glitch-digits {
+  animation: digitGlitch 5s infinite;
+  display: inline-block;
+}
+
+/* ── Glitch for section headers (SALA DE ESPERA etc) ── */
+@keyframes headerGlitch {
+  0%, 91%, 100% {
+    transform: none;
+    text-shadow: 0 0 8px rgba(180, 249, 83, 0.5);
+    opacity: 1;
+  }
+  92% {
+    transform: translate(-2px, 0) skewX(-5deg);
+    text-shadow: -2px 0 #F7931A, 2px 0 #4FC3F7;
+    opacity: 0.9;
+  }
+  93% {
+    transform: translate(2px, 1px);
+    text-shadow: 2px 0 #F7931A, -2px 0 #4FC3F7;
+  }
+  94.5% {
+    transform: none;
+    text-shadow: 0 0 8px rgba(180, 249, 83, 0.5);
+    opacity: 1;
+  }
+  95% {
+    /* quick flash */
+    opacity: 0.2;
+    transform: translate(0, -1px);
+  }
+  95.5% {
+    opacity: 1;
+  }
+}
+
+.glitch-header {
+  display: inline-block;
+  animation: headerGlitch 6s infinite;
+}
+
+/* ── Title glitch (NOSTR KAHOOT) — stronger, with color splits ── */
+@keyframes titleGlitch {
+  0%, 86%, 100% {
+    transform: none;
+    text-shadow: 0 0 6px rgba(180, 249, 83, 0.6), 0 0 14px rgba(180, 249, 83, 0.3);
+  }
+  87% {
+    transform: translate(-3px, 0) skewX(-8deg);
+    text-shadow: -3px 0 #F7931A, 3px 0 #4FC3F7, 0 0 6px rgba(180, 249, 83, 0.4);
+  }
+  88% {
+    transform: translate(3px, -1px) skewX(5deg);
+    text-shadow: 3px 0 #F7931A, -3px 0 #4FC3F7;
+  }
+  89% {
+    transform: none;
+    text-shadow: 0 0 6px rgba(180, 249, 83, 0.6);
+  }
+  89.5% {
+    /* brief white flash */
+    color: #fff;
+    text-shadow: 0 0 10px #fff, 0 0 20px rgba(180,249,83,0.8);
+    transform: translate(1px, 0);
+  }
+  90% {
+    color: #B4F953;
+    text-shadow: 0 0 6px rgba(180, 249, 83, 0.6);
+    transform: none;
+  }
+}
+
+.glitch-title {
+  display: inline-block;
+  color: #B4F953;
+  animation: titleGlitch 7s infinite;
+}
+
+/* ── Shared utilities ── */
+.animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+.animate-glow  { animation: glow 3s ease-in-out infinite; }
+
+/* ── Cypherpunk button ── */
 .crypto-btn {
   position: relative;
   border: 2px solid #B4F953;
@@ -139,9 +300,7 @@ code {
   text-shadow: 0 0 10px rgba(180, 249, 83, 0.8);
 }
 
-.crypto-btn:hover::before {
-  left: 100%;
-}
+.crypto-btn:hover::before { left: 100%; }
 
 .bitcoin-accent {
   color: #F7931A;

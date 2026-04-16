@@ -81,7 +81,10 @@ export function QuizHost({ quiz, onBack }) {
         <div className="flex justify-between items-center">
           <div>
             <p className="text-xs font-mono text-gray-600">[ HOST · {user?.name} ]</p>
-            <h2 className="text-2xl font-bold font-mono uppercase tracking-widest" style={{ color: '#B4F953', textShadow: '0 0 8px rgba(180,249,83,0.5)' }}>SALA DE ESPERA</h2>
+            <h2
+              className="text-2xl font-bold font-mono uppercase tracking-widest glitch-header"
+              style={{ color: '#B4F953' }}
+            >SALA DE ESPERA</h2>
           </div>
           <button onClick={() => { resetGame(); onBack(); }} className="px-3 py-1 font-mono text-xs uppercase" style={{ border: '1px solid rgba(255,68,68,0.4)', color: '#FF4444', background: '#0A0A0A' }}>[X]</button>
         </div>
@@ -89,7 +92,7 @@ export function QuizHost({ quiz, onBack }) {
         {/* PIN */}
         <div className="p-5 text-center space-y-2" style={{ border: '2px solid #B4F953', background: 'rgba(180,249,83,0.04)', boxShadow: '0 0 20px rgba(180,249,83,0.08)' }}>
           <p className="text-xs font-mono text-gray-500 uppercase tracking-widest">// GAME PIN</p>
-          <div className="text-6xl font-bold font-mono tracking-[0.3em]" style={{ color: '#B4F953', textShadow: '0 0 20px rgba(180,249,83,0.6)' }}>{pin}</div>
+          <div className="text-6xl font-bold font-mono glitch-digits" style={{ color: '#B4F953' }}>{pin}</div>
           <button onClick={copyPin} className="font-mono text-xs px-3 py-1" style={{ border: '1px solid rgba(180,249,83,0.4)', color: '#B4F953', background: copied ? 'rgba(180,249,83,0.12)' : '#0A0A0A' }}>
             {copied ? '✓ COPIADO' : '⎘ COPIAR PIN'}
           </button>
@@ -229,7 +232,10 @@ export function QuizHost({ quiz, onBack }) {
     return (
       <div className="max-w-xl mx-auto text-center space-y-5">
         <div className="p-8 space-y-5" style={{ border: '2px solid #B4F953', background: '#0A0A0A' }}>
-          <h2 className="text-3xl font-bold font-mono uppercase tracking-widest" style={{ color: '#B4F953', textShadow: '0 0 15px rgba(180,249,83,0.6)' }}>¡QUIZ TERMINADO!</h2>
+          <h2
+            className="text-3xl font-bold font-mono uppercase tracking-widest glitch-header"
+            style={{ color: '#B4F953' }}
+          >¡QUIZ TERMINADO!</h2>
           <div>
             <p className="text-xs font-mono font-bold uppercase tracking-widest mb-3" style={{ color: '#F7931A' }}>// RANKING FINAL</p>
             <div className="space-y-2">

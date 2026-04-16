@@ -62,9 +62,14 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <span className="text-3xl bitcoin-accent">₿</span>
+            <span className="text-3xl neon-bolt">⚡</span>
             <div className="flex flex-col">
-              <h1 className="text-2xl font-bold crypta-accent tracking-wider">NOSTR KAHOOT</h1>
+              <h1
+                className="text-2xl font-bold tracking-wider glitch-title"
+                data-text="NOSTR KAHOOT"
+              >
+                NOSTR KAHOOT
+              </h1>
               <p className="text-xs text-gray-400">[ DECENTRALIZED QUIZ PROTOCOL ]</p>
             </div>
           </div>
@@ -157,7 +162,7 @@ function App() {
       <footer className="fixed bottom-0 left-0 right-0 border-t-2 border-t-green-500 bg-black/60 text-xs text-gray-500 px-4 py-2 font-mono z-40">
         <div className="flex justify-between max-w-7xl mx-auto">
           <span>[ NOSTR PROTOCOL v1.0 ]</span>
-          <span>⚡ POWERED BY LIGHTNING + NIP-07 ⚡</span>
+          <span><span className="neon-bolt">⚡</span> POWERED BY LIGHTNING + NIP-07 <span className="neon-bolt">⚡</span></span>
           <span>[ CYPHERPUNK EDITION ]</span>
         </div>
       </footer>

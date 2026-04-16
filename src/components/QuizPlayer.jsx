@@ -150,10 +150,10 @@ export function QuizPlayer({ sessionPin }) {
         <div className="w-full max-w-sm space-y-6">
           {/* Logo */}
           <div className="text-center space-y-1">
-            <div className="text-5xl" style={{ color: '#F7931A', textShadow: '0 0 20px rgba(247,147,26,0.5)' }}>₿</div>
+            <div className="text-5xl neon-bolt">⚡</div>
             <h1
-              className="text-2xl font-bold font-mono tracking-widest uppercase"
-              style={{ color: '#B4F953', textShadow: '0 0 10px rgba(180,249,83,0.5)' }}
+              className="text-2xl font-bold font-mono tracking-widest uppercase glitch-title"
+              data-text="NOSTR KAHOOT"
             >
               NOSTR KAHOOT
             </h1>
@@ -296,8 +296,11 @@ export function QuizPlayer({ sessionPin }) {
 
           {/* Status */}
           <div className="space-y-2">
-            <div className="text-4xl animate-pulse">⚡</div>
-            <h2 className="text-xl font-bold font-mono uppercase tracking-widest" style={{ color: '#B4F953' }}>CONECTADO</h2>
+            <div className="text-4xl neon-bolt">⚡</div>
+            <h2
+              className="text-xl font-bold font-mono uppercase tracking-widest glitch-header"
+              style={{ color: '#B4F953' }}
+            >CONECTADO</h2>
             <p className="text-xs font-mono text-gray-500">Esperando que el host inicie la partida...</p>
           </div>
 
