@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuizStore } from '../store/quizStore';
 import { useAuthStore } from '../store/authStore';
 
-export function QuizGame({ onBack }) {
+export function QuizGame({ onBack, initialQuizId }) {
   const [sessionId, setSessionId] = useState('');
   const [currentQuiz, setCurrentQuiz] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
