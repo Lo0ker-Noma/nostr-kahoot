@@ -79,7 +79,10 @@ export const useQuizStore = create((set, get) => ({
 
   getQuizById: async (quizId) => {
     const { quizzes } = get();
-    return quizzes.find((q) => q.id === quizId) || null;
+    // Search loaded quizzes first, fall back to DEMO_QUIZZES directly
+    return quizzes.find((q) => q.id === quizId)
+      || DEMO_QUIZZES.find((q) => q.id === quizId)
+      || null;
   },
 
   saveAnswer: async (answerData) => {

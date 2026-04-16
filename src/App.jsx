@@ -133,6 +133,7 @@ function App() {
             <QuizGame
               onBack={() => { setView('dashboard'); setSoloQuiz(null); }}
               initialQuizId={soloQuiz?.id || null}
+              initialQuiz={soloQuiz || null}
             />
           )}
 

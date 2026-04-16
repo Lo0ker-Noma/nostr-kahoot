@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useQuizStore } from '../store/quizStore';
 import { useAuthStore } from '../store/authStore';
 
-export function QuizGame({ onBack, initialQuizId }) {
+export function QuizGame({ onBack, initialQuizId, initialQuiz }) {
   const [sessionId, setSessionId] = useState('');
-  const [currentQuiz, setCurrentQuiz] = useState(null);
+  const [currentQuiz, setCurrentQuiz] = useState(initialQuiz || null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [score, setScore] = useState(0);
