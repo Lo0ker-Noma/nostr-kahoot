@@ -83,6 +83,7 @@ export function QuizHost({ quiz, onBack }) {
             <p className="text-xs font-mono text-gray-600">[ HOST · {user?.name} ]</p>
             <h2
               className="text-2xl font-bold font-mono uppercase tracking-widest glitch-header"
+              data-text="SALA DE ESPERA"
               style={{ color: '#B4F953' }}
             >SALA DE ESPERA</h2>
           </div>
@@ -92,7 +93,7 @@ export function QuizHost({ quiz, onBack }) {
         {/* PIN */}
         <div className="p-5 text-center space-y-2" style={{ border: '2px solid #B4F953', background: 'rgba(180,249,83,0.04)', boxShadow: '0 0 20px rgba(180,249,83,0.08)' }}>
           <p className="text-xs font-mono text-gray-500 uppercase tracking-widest">// GAME PIN</p>
-          <div className="text-6xl font-bold font-mono glitch-digits" style={{ color: '#B4F953' }}>{pin}</div>
+          <div className="text-6xl font-bold font-mono glitch-digits" data-text={pin} style={{ color: '#B4F953' }}>{pin}</div>
           <button onClick={copyPin} className="font-mono text-xs px-3 py-1" style={{ border: '1px solid rgba(180,249,83,0.4)', color: '#B4F953', background: copied ? 'rgba(180,249,83,0.12)' : '#0A0A0A' }}>
             {copied ? '✓ COPIADO' : '⎘ COPIAR PIN'}
           </button>
@@ -234,6 +235,7 @@ export function QuizHost({ quiz, onBack }) {
         <div className="p-8 space-y-5" style={{ border: '2px solid #B4F953', background: '#0A0A0A' }}>
           <h2
             className="text-3xl font-bold font-mono uppercase tracking-widest glitch-header"
+            data-text="¡QUIZ TERMINADO!"
             style={{ color: '#B4F953' }}
           >¡QUIZ TERMINADO!</h2>
           <div>

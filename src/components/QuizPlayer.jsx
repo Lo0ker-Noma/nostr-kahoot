@@ -299,6 +299,7 @@ export function QuizPlayer({ sessionPin }) {
             <div className="text-4xl neon-bolt">⚡</div>
             <h2
               className="text-xl font-bold font-mono uppercase tracking-widest glitch-header"
+              data-text="CONECTADO"
               style={{ color: '#B4F953' }}
             >CONECTADO</h2>
             <p className="text-xs font-mono text-gray-500">Esperando que el host inicie la partida...</p>
