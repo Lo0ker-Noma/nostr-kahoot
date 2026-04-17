@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { WaveBackground } from './WaveBackground';
-import { BackgroundMusic } from './MusicToggle';
 
 export function AuthModal() {
   const [loading, setLoading] = useState(false);
@@ -30,7 +29,6 @@ export function AuthModal() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden" style={{ background: '#0A0A0A' }}>
       <WaveBackground />
-      <BackgroundMusic position="top-right" />
       <div className="fixed inset-0 pointer-events-none z-10" style={{ backgroundImage: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 1px, transparent 1px, transparent 2px)' }} />
       <div className="max-w-md w-full relative z-20">
         <div className="text-xs font-mono text-green-500 mb-2 flex justify-between">

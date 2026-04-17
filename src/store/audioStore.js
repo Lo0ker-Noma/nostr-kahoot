@@ -4,11 +4,13 @@ import { create } from 'zustand';
  * audioStore — manages a single background music HTMLAudio instance.
  *
  * Design:
+ *  - Music is GLOBAL: once started it plays continuously across all screens
+ *    until the user toggles it off. No per-screen mount/unmount lifecycle.
  *  - isEnabled: user's mute preference (persisted to localStorage)
- *  - screenCount: how many "music screens" are currently mounted
- *  - Music plays iff (isEnabled && screenCount > 0)
- *  - If the browser blocks autoplay (no user gesture yet) the first
- *    toggle click counts as a gesture and unlocks playback.
+ *  - `start()` is idempotent — safe to call on every screen mount. If the
+ *    browser blocks autoplay (no user gesture yet) the first toggle click
+ *    counts as a gesture and unlocks playback.
+ *  - `toggle()` flips isEnabled and immediately plays or pauses.
  */
 
 const TRACK_SRC = '/clubbed-to-death.mp3';
@@ -48,34 +50,23 @@ const getAudio = () => {
 
 export const useAudioStore = create((set, get) => ({
   isEnabled: loadPreference(),
-  screenCount: 0,
   isPlaying: false,
   blocked: false, // true when browser blocked autoplay
 
-  mount: () => {
-    set((s) => ({ screenCount: s.screenCount + 1 }));
-    if (get().isEnabled) {
-      const a = getAudio();
-      if (!a) return;
-      try {
-        const p = a.play();
-        if (p && typeof p.then === 'function') {
-          p.then(() => set({ isPlaying: true, blocked: false }))
-           .catch(() => set({ isPlaying: false, blocked: true }));
-        }
-      } catch { set({ isPlaying: false, blocked: true }); }
-    }
-  },
-
-  unmount: () => {
-    set((s) => ({ screenCount: Math.max(0, s.screenCount - 1) }));
-    // If nobody needs music anymore, pause it
-    if (get().screenCount === 0) {
-      const a = getAudio();
-      if (!a) return;
-      try { a.pause(); } catch {}
-      set({ isPlaying: false });
-    }
+  // Idempotent: safe to call from every screen. If disabled, does nothing.
+  // If already playing, does nothing. Otherwise tries to start playback.
+  start: () => {
+    if (!get().isEnabled) return;
+    const a = getAudio();
+    if (!a) return;
+    if (!a.paused) return;
+    try {
+      const p = a.play();
+      if (p && typeof p.then === 'function') {
+        p.then(() => set({ isPlaying: true, blocked: false }))
+         .catch(() => set({ isPlaying: false, blocked: true }));
+      }
+    } catch { set({ isPlaying: false, blocked: true }); }
   },
 
   toggle: () => {
@@ -84,7 +75,7 @@ export const useAudioStore = create((set, get) => ({
     set({ isEnabled: next });
     const a = getAudio();
     if (!a) return;
-    if (next && get().screenCount > 0) {
+    if (next) {
       try {
         const p = a.play();
         if (p && typeof p.then === 'function') {

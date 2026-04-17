@@ -6,6 +6,7 @@ import { QuizCreator } from './components/QuizCreator';
 import { QuizGame } from './components/QuizGame';
 import { QuizHost } from './components/QuizHost';
 import { QuizPlayer } from './components/QuizPlayer';
+import { BackgroundMusic } from './components/MusicToggle';
 
 function App() {
   const { isAuthenticated, user, isReadOnly } = useAuthStore();
@@ -37,16 +38,27 @@ function App() {
 
   // ── Player mode: skip auth entirely ──
   if (view === 'player' && sessionPin) {
-    return <QuizPlayer sessionPin={sessionPin} />;
+    return (
+      <>
+        <BackgroundMusic />
+        <QuizPlayer sessionPin={sessionPin} />
+      </>
+    );
   }
 
   // ── Auth gate ──
   if (!isAuthenticated) {
-    return <AuthModal />;
+    return (
+      <>
+        <BackgroundMusic />
+        <AuthModal />
+      </>
+    );
   }
 
   return (
     <div className="min-h-screen bg-black text-white">
+      <BackgroundMusic />
       {/* Scanline effect */}
       <div
         className="fixed top-0 left-0 w-full h-full pointer-events-none z-50"

@@ -2,21 +2,17 @@ import React, { useEffect } from 'react';
 import { useAudioStore } from '../store/audioStore';
 
 /**
- * useBackgroundMusic — mount hook for screens where music should play.
- * Call inside a component; music starts on mount, pauses on unmount.
+ * useBackgroundMusic — call inside any screen to ensure music is playing.
+ * No cleanup: music is global and persists across screens by design.
  */
 export function useBackgroundMusic() {
-  const mount = useAudioStore((s) => s.mount);
-  const unmount = useAudioStore((s) => s.unmount);
-  useEffect(() => {
-    mount();
-    return () => unmount();
-  }, [mount, unmount]);
+  const start = useAudioStore((s) => s.start);
+  useEffect(() => { start(); }, [start]);
 }
 
 /**
- * BackgroundMusic — all-in-one: mounts music hook + renders the toggle.
- * Drop inside any screen that should have background music.
+ * BackgroundMusic — mounts the music hook + renders the toggle button.
+ * Drop once at the app root so music plays continuously across views.
  */
 export function BackgroundMusic({ position = 'top-right' }) {
   useBackgroundMusic();
@@ -25,7 +21,8 @@ export function BackgroundMusic({ position = 'top-right' }) {
 
 /**
  * MusicToggle — fixed-position 🔊/🔇 button. Toggles music on/off.
- * Preference is persisted to localStorage via audioStore.
+ * On mobile (< sm) shows icon only so it doesn't overlap header text.
+ * On ≥ sm it shows icon + MUSIC ON/OFF label.
  */
 export function MusicToggle({ position = 'top-right' }) {
   const isEnabled = useAudioStore((s) => s.isEnabled);
@@ -33,47 +30,40 @@ export function MusicToggle({ position = 'top-right' }) {
   const toggle = useAudioStore((s) => s.toggle);
 
   const positionStyle = position === 'top-right'
-    ? { top: '1rem', right: '1rem' }
-    : { bottom: '1rem', right: '1rem' };
+    ? { top: '0.75rem', right: '0.75rem' }
+    : { bottom: '0.75rem', right: '0.75rem' };
 
   const title = blocked
     ? 'Música bloqueada — click para activar'
     : isEnabled ? 'Silenciar música' : 'Activar música';
+
+  const color = isEnabled ? '#B4F953' : '#F7931A';
+  const glow = isEnabled ? 'rgba(180,249,83,0.3)' : 'rgba(247,147,26,0.3)';
+  const glowHover = isEnabled ? 'rgba(180,249,83,0.6)' : 'rgba(247,147,26,0.6)';
 
   return (
     <button
       onClick={toggle}
       title={title}
       aria-label={title}
-      className="fixed font-mono text-xs transition-all"
+      className="fixed font-mono transition-all flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-1.5 sm:px-3 sm:py-2"
       style={{
         ...positionStyle,
         zIndex: 60,
-        border: `2px solid ${isEnabled ? '#B4F953' : '#F7931A'}`,
+        border: `2px solid ${color}`,
         background: 'rgba(10,10,10,0.85)',
-        color: isEnabled ? '#B4F953' : '#F7931A',
-        padding: '8px 12px',
+        color,
         letterSpacing: '0.15em',
-        boxShadow: isEnabled
-          ? '0 0 12px rgba(180,249,83,0.3)'
-          : '0 0 12px rgba(247,147,26,0.3)',
+        boxShadow: `0 0 12px ${glow}`,
         cursor: 'pointer',
       }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = isEnabled
-          ? '0 0 18px rgba(180,249,83,0.6)'
-          : '0 0 18px rgba(247,147,26,0.6)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = isEnabled
-          ? '0 0 12px rgba(180,249,83,0.3)'
-          : '0 0 12px rgba(247,147,26,0.3)';
-      }}
+      onMouseEnter={(e) => { e.currentTarget.style.boxShadow = `0 0 18px ${glowHover}`; }}
+      onMouseLeave={(e) => { e.currentTarget.style.boxShadow = `0 0 12px ${glow}`; }}
     >
-      <span style={{ marginRight: '0.45rem', fontSize: '1.05rem' }}>
+      <span className="text-sm sm:text-base leading-none">
         {isEnabled ? '🔊' : '🔇'}
       </span>
-      <span>{isEnabled ? 'MUSIC ON' : 'MUSIC OFF'}</span>
+      <span className="hidden sm:inline">{isEnabled ? 'MUSIC ON' : 'MUSIC OFF'}</span>
     </button>
   );
 }
