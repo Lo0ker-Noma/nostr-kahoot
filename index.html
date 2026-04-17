@@ -4,9 +4,22 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Kahoot descentralizado en Nostr para hackathones" />
-    <meta name="theme-color" content="#4c1d95" />
-    <title>⚡ Nostr Kahoot - Hackathon 2</title>
+    <meta name="description" content="Kahoot descentralizado en Nostr — La Crypta Hackathon 2026" />
+    <meta name="theme-color" content="#0A0A0A" />
+    <meta name="referrer" content="no-referrer" />
+    <!--
+      Content-Security-Policy — hardens the app against XSS and data exfiltration.
+      - script-src 'self' only (Vite emits hashed ES modules from same origin)
+      - connect-src wss://* (Nostr relays over TLS) + https for images
+      - img-src / media-src allow http+https because user-uploaded Nostr avatars
+        may live anywhere. We already validate URLs server-side in nostrRelay.js.
+      - object-src 'none', base-uri 'self', frame-ancestors 'none'
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; media-src 'self' blob: https:; font-src 'self' data:; connect-src 'self' wss: https:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self';"
+    />
+    <title>Nostr Kahoot — Decentralized Quiz Protocol</title>
   </head>
   <body>
     <div id="root"></div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { nip19 } from 'nostr-tools';
 import { useGameStore, POINTS_PER_CORRECT, QUESTION_SECONDS } from '../store/gameStore';
 import { fetchNostrProfile } from '../lib/nostrRelay';
 
@@ -74,32 +75,23 @@ export function QuizPlayer({ sessionPin }) {
   }, []);
 
   const handleFetchNpub = async () => {
-    if (!npubInput.trim()) return;
+    const raw = npubInput.trim();
+    if (!raw || raw.length > 200) return;
     setLoadingProfile(true);
     try {
-      const CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
-      const input = npubInput.trim();
-      if (input.startsWith('npub1')) {
-        const data = input.slice(5);
-        const decoded = [];
-        for (const c of data) {
-          const idx = CHARSET.indexOf(c);
-          if (idx !== -1) decoded.push(idx);
+      let hex = null;
+      if (/^[0-9a-f]{64}$/i.test(raw)) {
+        hex = raw.toLowerCase();
+      } else {
+        const { type, data } = nip19.decode(raw);
+        if (type === 'npub' && typeof data === 'string' && /^[0-9a-f]{64}$/i.test(data)) {
+          hex = data;
         }
-        const payload = decoded.slice(0, decoded.length - 6);
-        let bits = 0, value = 0;
-        const result = [];
-        for (const d of payload) {
-          value = (value << 5) | d;
-          bits += 5;
-          while (bits >= 8) { bits -= 8; result.push((value >> bits) & 0xff); }
-        }
-        if (result.length === 32) {
-          const hex = result.map(b => b.toString(16).padStart(2, '0')).join('');
-          const profile = await fetchNostrProfile(hex);
-          setPlayerProfile(profile);
-          setNameInput(profile.name);
-        }
+      }
+      if (hex) {
+        const profile = await fetchNostrProfile(hex);
+        setPlayerProfile(profile);
+        setNameInput(profile.name);
       }
     } catch {}
     setLoadingProfile(false);
@@ -117,10 +109,10 @@ export function QuizPlayer({ sessionPin }) {
 
   const handleAnswer = (idx) => {
     if (answered || timerExpired || !currentQuestion) return;
-    const isCorrect = idx === currentQuestion.correct;
     setSelectedAnswer(idx);
     setAnswered(true);
-    submitAnswer(currentQuestionIndex, idx, isCorrect);
+    // Server/host computes correctness — we don't send a trusted `correct` flag.
+    submitAnswer(currentQuestionIndex, idx);
   };
 
   const handleTimerExpire = () => {

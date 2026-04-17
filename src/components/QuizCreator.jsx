@@ -2,6 +2,19 @@ import React, { useState } from 'react';
 import { useQuizStore } from '../store/quizStore';
 import { useAuthStore } from '../store/authStore';
 
+// Input caps — defend against huge-payload DoS and malformed Nostr events.
+const MAX_TITLE = 120;
+const MAX_DESC = 500;
+const MAX_QUESTION = 300;
+const MAX_ANSWER = 120;
+const MAX_QUESTIONS = 50;
+
+// Strip C0/C1 control chars (incl. null bytes / ANSI escapes) and cap length.
+function clean(raw, maxLen) {
+  if (typeof raw !== 'string') return '';
+  return raw.replace(/[\u0000-\u001F\u007F-\u009F]/g, '').slice(0, maxLen);
+}
+
 export function QuizCreator({ onBack }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -24,13 +37,21 @@ export function QuizCreator({ onBack }) {
   };
 
   const addQuestion = () => {
-    if (!currentQuestion.trim() || currentAnswers.some(a => !a.trim())) {
+    const q = clean(currentQuestion, MAX_QUESTION).trim();
+    const answers = currentAnswers.map(a => clean(a, MAX_ANSWER).trim());
+    if (!q || answers.some(a => !a)) {
       alert('Por favor completa todos los campos');
       return;
     }
+    if (questions.length >= MAX_QUESTIONS) {
+      alert(`Máximo ${MAX_QUESTIONS} preguntas por quiz`);
+      return;
+    }
+    const correctIdx = Math.max(0, Math.min(3, correctAnswerIndex | 0));
+    const diff = ['easy', 'medium', 'hard'].includes(difficulty) ? difficulty : 'medium';
     setQuestions([
       ...questions,
-      { id: Date.now(), question: currentQuestion, answers: currentAnswers, correct: correctAnswerIndex, difficulty },
+      { id: Date.now(), question: q, answers, correct: correctIdx, difficulty: diff },
     ]);
     setCurrentQuestion('');
     setCurrentAnswers(['', '', '', '']);
@@ -42,17 +63,26 @@ export function QuizCreator({ onBack }) {
   };
 
   const handlePublish = async () => {
-    if (!title.trim() || questions.length === 0) {
+    const cleanTitle = clean(title, MAX_TITLE).trim();
+    const cleanDesc = clean(description, MAX_DESC).trim();
+    if (!cleanTitle || questions.length === 0) {
       alert('Necesitas titulo y al menos una pregunta');
       return;
     }
     setLoading(true);
     try {
-      await createQuiz({ title, description, questions, creator: pubkey, createdAt: new Date().toISOString(), participants: 0 });
+      await createQuiz({
+        title: cleanTitle,
+        description: cleanDesc,
+        questions: questions.slice(0, MAX_QUESTIONS),
+        creator: pubkey,
+        createdAt: new Date().toISOString(),
+        participants: 0,
+      });
       alert('Quiz publicado en Nostr');
       onBack();
     } catch (error) {
-      console.error('Error publishing quiz:', error);
+      if (import.meta.env && import.meta.env.DEV) console.error('Error publishing quiz:', error);
       alert('ERROR: Failed to publish quiz');
     } finally {
       setLoading(false);
@@ -77,11 +107,11 @@ export function QuizCreator({ onBack }) {
         <p className="text-xs font-mono text-gray-500">&#9654; QUIZ_METADATA</p>
         <div>
           <label className="block text-xs font-mono font-bold mb-2 uppercase tracking-widest" style={{ color: '#F7931A' }}>// TITULO</label>
-          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. NOSTR FUNDAMENTALS" className="w-full px-4 py-2 text-sm font-mono" style={inputStyle} />
+          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. NOSTR FUNDAMENTALS" maxLength={MAX_TITLE} className="w-full px-4 py-2 text-sm font-mono" style={inputStyle} />
         </div>
         <div>
           <label className="block text-xs font-mono font-bold mb-2 uppercase tracking-widest" style={{ color: '#F7931A' }}>// DESCRIPCION</label>
-          <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe tu quiz..." className="w-full px-4 py-2 text-sm font-mono h-20 resize-none" style={inputStyle} />
+          <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe tu quiz..." maxLength={MAX_DESC} className="w-full px-4 py-2 text-sm font-mono h-20 resize-none" style={inputStyle} />
         </div>
       </div>
 
@@ -89,7 +119,7 @@ export function QuizCreator({ onBack }) {
         <p className="text-xs font-mono text-gray-500">&#9654; ADD_QUESTION [ {questions.length} ADDED ]</p>
         <div>
           <label className="block text-xs font-mono font-bold mb-2 uppercase tracking-widest" style={{ color: '#F7931A' }}>// PREGUNTA</label>
-          <input type="text" value={currentQuestion} onChange={(e) => setCurrentQuestion(e.target.value)} placeholder="Que es un relay de Nostr?" className="w-full px-4 py-2 text-sm font-mono" style={inputStyle} />
+          <input type="text" value={currentQuestion} onChange={(e) => setCurrentQuestion(e.target.value)} placeholder="Que es un relay de Nostr?" maxLength={MAX_QUESTION} className="w-full px-4 py-2 text-sm font-mono" style={inputStyle} />
         </div>
         <div>
           <label className="block text-xs font-mono font-bold mb-2 uppercase tracking-widest" style={{ color: '#F7931A' }}>// DIFICULTAD</label>
@@ -107,7 +137,7 @@ export function QuizCreator({ onBack }) {
                 <button type="button" onClick={() => setCorrectAnswerIndex(idx)} className="w-5 h-5 font-mono text-xs flex items-center justify-center flex-shrink-0 transition-all" style={{ border: correctAnswerIndex === idx ? '2px solid #B4F953' : '2px solid rgba(180,249,83,0.3)', background: correctAnswerIndex === idx ? '#B4F953' : 'transparent', color: correctAnswerIndex === idx ? '#0A0A0A' : '#B4F953' }}>
                   {correctAnswerIndex === idx ? '&#10003;' : ''}
                 </button>
-                <input type="text" value={answer} onChange={(e) => { const n = [...currentAnswers]; n[idx] = e.target.value; setCurrentAnswers(n); }} placeholder={`OPCION ${idx + 1}`} className="flex-1 px-4 py-2 text-sm font-mono" style={{ ...inputStyle, borderColor: correctAnswerIndex === idx ? 'rgba(180,249,83,0.5)' : 'rgba(180,249,83,0.2)' }} />
+                <input type="text" value={answer} onChange={(e) => { const n = [...currentAnswers]; n[idx] = e.target.value; setCurrentAnswers(n); }} placeholder={`OPCION ${idx + 1}`} maxLength={MAX_ANSWER} className="flex-1 px-4 py-2 text-sm font-mono" style={{ ...inputStyle, borderColor: correctAnswerIndex === idx ? 'rgba(180,249,83,0.5)' : 'rgba(180,249,83,0.2)' }} />
               </div>
             ))}
           </div>

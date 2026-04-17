@@ -14,25 +14,34 @@ import { create } from 'zustand';
 const TRACK_SRC = '/clubbed-to-death.mp3';
 const STORAGE_KEY = 'nostr-kahoot-music-enabled';
 
+const hasWindow = typeof window !== 'undefined';
+
+// Strict tri-state: only '1' → on, '0' → off, anything else → default (on).
+// This defends against a hostile extension / XSS poisoning the value.
 const loadPreference = () => {
+  if (!hasWindow) return true;
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === null) return true; // default: music ON
-    return stored === '1';
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (stored === '1') return true;
+    if (stored === '0') return false;
+    return true; // default: music ON
   } catch { return true; }
 };
 
 const savePreference = (enabled) => {
-  try { localStorage.setItem(STORAGE_KEY, enabled ? '1' : '0'); } catch {}
+  if (!hasWindow) return;
+  try { window.localStorage.setItem(STORAGE_KEY, enabled ? '1' : '0'); } catch {}
 };
 
 let audioEl = null;
 const getAudio = () => {
+  if (!hasWindow) return null;
   if (!audioEl) {
     audioEl = new Audio(TRACK_SRC);
     audioEl.loop = true;
     audioEl.volume = 0.45;
     audioEl.preload = 'auto';
+    audioEl.crossOrigin = 'anonymous';
   }
   return audioEl;
 };
@@ -47,9 +56,14 @@ export const useAudioStore = create((set, get) => ({
     set((s) => ({ screenCount: s.screenCount + 1 }));
     if (get().isEnabled) {
       const a = getAudio();
-      a.play()
-        .then(() => set({ isPlaying: true, blocked: false }))
-        .catch(() => set({ isPlaying: false, blocked: true }));
+      if (!a) return;
+      try {
+        const p = a.play();
+        if (p && typeof p.then === 'function') {
+          p.then(() => set({ isPlaying: true, blocked: false }))
+           .catch(() => set({ isPlaying: false, blocked: true }));
+        }
+      } catch { set({ isPlaying: false, blocked: true }); }
     }
   },
 
@@ -58,7 +72,8 @@ export const useAudioStore = create((set, get) => ({
     // If nobody needs music anymore, pause it
     if (get().screenCount === 0) {
       const a = getAudio();
-      a.pause();
+      if (!a) return;
+      try { a.pause(); } catch {}
       set({ isPlaying: false });
     }
   },
@@ -68,14 +83,17 @@ export const useAudioStore = create((set, get) => ({
     savePreference(next);
     set({ isEnabled: next });
     const a = getAudio();
+    if (!a) return;
     if (next && get().screenCount > 0) {
-      // Turning ON and on a music screen — play
-      a.play()
-        .then(() => set({ isPlaying: true, blocked: false }))
-        .catch(() => set({ isPlaying: false, blocked: true }));
+      try {
+        const p = a.play();
+        if (p && typeof p.then === 'function') {
+          p.then(() => set({ isPlaying: true, blocked: false }))
+           .catch(() => set({ isPlaying: false, blocked: true }));
+        }
+      } catch { set({ isPlaying: false, blocked: true }); }
     } else {
-      // Turning OFF
-      a.pause();
+      try { a.pause(); } catch {}
       set({ isPlaying: false });
     }
   },
