@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
+import { WaveBackground } from './WaveBackground';
 
 export function AuthModal() {
   const [loading, setLoading] = useState(false);
@@ -26,8 +27,9 @@ export function AuthModal() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#0A0A0A', backgroundImage: 'linear-gradient(0deg, rgba(180,249,83,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(180,249,83,0.05) 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
-      <div className="fixed inset-0 pointer-events-none z-10" style={{ backgroundImage: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.12) 0px, rgba(0,0,0,0.12) 1px, transparent 1px, transparent 2px)' }} />
+    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden" style={{ background: '#0A0A0A' }}>
+      <WaveBackground />
+      <div className="fixed inset-0 pointer-events-none z-10" style={{ backgroundImage: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 1px, transparent 1px, transparent 2px)' }} />
       <div className="max-w-md w-full relative z-20">
         <div className="text-xs font-mono text-green-500 mb-2 flex justify-between">
           <span>[ SYS: NOSTR_AUTH ]</span>
@@ -35,11 +37,18 @@ export function AuthModal() {
         </div>
         <div className="border-2 border-green-500 p-8 space-y-6" style={{ background: 'rgba(0,0,0,0.85)' }}>
           <div className="text-center space-y-3">
-            <div className="flex items-center justify-center gap-3">
-              <span className="text-5xl" style={{ color: '#F7931A', textShadow: '0 0 12px rgba(247,147,26,0.7)' }}>₿</span>
-              <span className="text-5xl">⚡</span>
+            <div className="flex items-center justify-center gap-4">
+              <span
+                className="text-6xl glitch-subtle"
+                data-text="₿"
+                style={{ color: '#F7931A', fontWeight: 900, textShadow: '0 0 14px rgba(247,147,26,0.75), 0 0 28px rgba(247,147,26,0.35)' }}
+              >₿</span>
+              <span className="text-6xl neon-bolt">⚡</span>
             </div>
-            <h1 className="text-3xl font-bold font-mono tracking-widest uppercase" style={{ color: '#B4F953', textShadow: '0 0 8px rgba(180,249,83,0.6)' }}>NOSTR KAHOOT</h1>
+            <h1
+              className="text-3xl font-bold font-mono tracking-widest uppercase glitch-title"
+              data-text="NOSTR KAHOOT"
+            >NOSTR KAHOOT</h1>
             <p className="text-xs font-mono text-gray-500 tracking-wider">[ DECENTRALIZED QUIZ PROTOCOL — CYPHERPUNK EDITION ]</p>
           </div>
 
