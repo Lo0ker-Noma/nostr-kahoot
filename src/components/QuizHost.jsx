@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useGameStore, QUESTION_SECONDS, POINTS_PER_CORRECT } from '../store/gameStore';
 import { useAuthStore } from '../store/authStore';
+import { BackgroundMusic } from './MusicToggle';
 
 const BTN_COLORS = ['#B4F953', '#F7931A', '#4FC3F7', '#E91E8C'];
 const BTN_LABELS = ['A', 'B', 'C', 'D'];
@@ -78,6 +79,7 @@ export function QuizHost({ quiz, onBack }) {
     const playerList = Object.values(players);
     return (
       <div className="max-w-2xl mx-auto space-y-5">
+        <BackgroundMusic position="top-right" />
         <div className="flex justify-between items-center">
           <div>
             <p className="text-xs font-mono text-gray-600">[ HOST · {user?.name} ]</p>
