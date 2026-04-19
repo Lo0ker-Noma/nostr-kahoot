@@ -49,6 +49,7 @@ const DEMO_QUIZZES = [
       { id: 103, question: '¿Qué protocolo de pagos usa La Crypta para transacciones rápidas?', answers: ['Lightning Network', 'SWIFT', 'PayPal', 'Ethereum L2'], correct: 0, difficulty: 'medium' },
       { id: 104, question: '¿Cuál es la filosofía principal de La Crypta?', answers: ['Soberanía individual, privacidad y software libre — valores cypherpunk', 'Maximizar profits en DeFi', 'Promover regulación bancaria', 'Vender NFTs'], correct: 0, difficulty: 'medium' },
       { id: 105, question: '¿Qué temática tiene el hackathon 2026 de La Crypta?', answers: ['Identidad descentralizada y redes sociales (Identity & Social)', 'DeFi y yield farming', 'Metaverso y realidad virtual', 'Gaming blockchain'], correct: 0, difficulty: 'easy' },
+      { id: 106, question: '¿En qué CC El Gorila se la comió entera con el usuario Kerry Kaberga?', answers: ['CC 169', 'CC 133', 'CC 157', 'CC 132'], correct: 1, difficulty: 'hard' },
     ],
     creator: 'hackathon-demo', participants: 21,
   },

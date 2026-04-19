@@ -172,7 +172,7 @@ export function QuizHost({ quiz, onBack }) {
                 <div className="w-full h-2" style={{ background: 'rgba(255,255,255,0.06)' }}>
                   <div className="h-full transition-all duration-700" style={{ width: `${pct}%`, background: color }} />
                 </div>
-                {isCorrect && <p className="text-xs font-mono font-bold" style={{ color: '#B4F953' }}>✓ CORRECTA · +{POINTS_PER_CORRECT} pts</p>}
+                {isCorrect && <p className="text-xs font-mono font-bold" style={{ color: '#B4F953' }}>✓ CORRECTA · +{POINTS_PER_CORRECT} sats ⚡</p>}
               </div>
             );
           })}
@@ -191,7 +191,7 @@ export function QuizHost({ quiz, onBack }) {
                     <span className={p.correct ? 'text-green-400' : p.answered ? 'text-red-400' : 'text-gray-600'}>
                       {p.correct ? '✓' : p.answered ? '✕' : '–'} {p.name}
                     </span>
-                    <span style={{ color: p.correct ? '#B4F953' : '#555' }}>{p.correct ? `+${POINTS_PER_CORRECT}` : '0'}</span>
+                    <span style={{ color: p.correct ? '#B4F953' : '#555' }}>{p.correct ? `+${POINTS_PER_CORRECT} sats` : '0 sats'}</span>
                   </div>
                 ))
               }
@@ -208,7 +208,7 @@ export function QuizHost({ quiz, onBack }) {
                     {i === 0 ? '🏆' : i === 1 ? '⚡' : `#${i+1}`}
                   </span>
                   <span className="flex-1 text-white truncate">{p.name}</span>
-                  <span style={{ color: '#F7931A' }}>{p.score}</span>
+                  <span style={{ color: '#F7931A' }}>⚡ {p.score} sats</span>
                 </div>
               ))}
             </div>
@@ -238,6 +238,41 @@ export function QuizHost({ quiz, onBack }) {
             data-text="¡QUIZ TERMINADO!"
             style={{ color: '#B4F953' }}
           >¡QUIZ TERMINADO!</h2>
+
+          {/* Winner spotlight — total sats ganados */}
+          {leaderboard.length > 0 && (
+            <div
+              className="p-5 space-y-2"
+              style={{
+                border: '2px solid #F7931A',
+                background: 'rgba(247,147,26,0.08)',
+                boxShadow: '0 0 30px rgba(247,147,26,0.25)',
+              }}
+            >
+              <p className="text-xs font-mono uppercase tracking-widest text-gray-500">// GANADOR</p>
+              <div className="flex items-center justify-center gap-3">
+                <span className="text-3xl">🏆</span>
+                {leaderboard[0].picture && (
+                  <img
+                    src={leaderboard[0].picture}
+                    alt=""
+                    className="w-10 h-10 rounded-full"
+                    style={{ border: '2px solid rgba(247,147,26,0.6)' }}
+                    onError={e => { e.target.style.display='none'; }}
+                  />
+                )}
+                <span className="font-mono font-bold text-xl text-white">{leaderboard[0].name}</span>
+              </div>
+              <div
+                className="text-4xl font-bold font-mono"
+                style={{ color: '#F7931A', textShadow: '0 0 20px rgba(247,147,26,0.6)' }}
+              >
+                ⚡ {leaderboard[0].score} sats
+              </div>
+              <p className="text-xs font-mono text-gray-500 uppercase tracking-widest">TOTAL SATS GANADOS</p>
+            </div>
+          )}
+
           <div>
             <p className="text-xs font-mono font-bold uppercase tracking-widest mb-3" style={{ color: '#F7931A' }}>// RANKING FINAL</p>
             <div className="space-y-2">
@@ -248,7 +283,7 @@ export function QuizHost({ quiz, onBack }) {
                   </span>
                   {p.picture && <img src={p.picture} alt="" className="w-6 h-6 rounded-full" style={{ border: '1px solid rgba(180,249,83,0.3)' }} onError={e => { e.target.style.display='none'; }} />}
                   <span className="flex-1 text-white text-left truncate">{p.name}</span>
-                  <span className="font-bold" style={{ color: '#F7931A' }}>{p.score} pts</span>
+                  <span className="font-bold" style={{ color: '#F7931A' }}>⚡ {p.score} sats</span>
                 </div>
               ))}
             </div>

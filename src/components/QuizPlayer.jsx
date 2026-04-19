@@ -368,7 +368,7 @@ export function QuizPlayer({ sessionPin }) {
             )}
             <span style={{ color: '#B4F953' }}>{playerName}</span>
           </div>
-          <span style={{ color: '#F7931A' }}>⚡ {myScore} pts</span>
+          <span style={{ color: '#F7931A' }}>⚡ {myScore} sats</span>
         </div>
 
         <div className="flex-1 p-4 space-y-4 overflow-y-auto pb-8">
@@ -387,7 +387,7 @@ export function QuizPlayer({ sessionPin }) {
               {iGotItRight ? '✓ CORRECTO' : '✕ INCORRECTO'}
             </p>
             {iGotItRight && (
-              <p className="text-sm font-mono mt-1" style={{ color: '#F7931A' }}>+{POINTS_PER_CORRECT} pts</p>
+              <p className="text-sm font-mono mt-1" style={{ color: '#F7931A' }}>⚡ +{POINTS_PER_CORRECT} sats</p>
             )}
           </div>
 
@@ -452,7 +452,7 @@ export function QuizPlayer({ sessionPin }) {
                     >
                       {p.name}{isMe ? ' ◄' : ''}
                     </span>
-                    <span style={{ color: '#F7931A' }}>{p.score} pts</span>
+                    <span style={{ color: '#F7931A' }}>⚡ {p.score} sats</span>
                   </div>
                 );
               })}
@@ -463,7 +463,7 @@ export function QuizPlayer({ sessionPin }) {
                 >
                   <span className="w-6 text-center" style={{ color: '#F7931A' }}>{myRank}.</span>
                   <span className="flex-1" style={{ color: '#B4F953' }}>{playerName} ◄</span>
-                  <span style={{ color: '#F7931A' }}>{myScore} pts</span>
+                  <span style={{ color: '#F7931A' }}>⚡ {myScore} sats</span>
                 </div>
               )}
             </div>
@@ -518,13 +518,18 @@ export function QuizPlayer({ sessionPin }) {
 
             {/* Final score */}
             <div>
+              {myRank === 1 && (
+                <p className="text-xl font-mono font-bold mb-2" style={{ color: '#F7931A', textShadow: '0 0 10px rgba(247,147,26,0.5)' }}>
+                  🏆 ¡GANADOR!
+                </p>
+              )}
               <div
                 className="text-6xl font-bold font-mono"
                 style={{ color: '#F7931A', textShadow: '0 0 20px rgba(247,147,26,0.6)' }}
               >
-                {myScore}
+                ⚡ {myScore}
               </div>
-              <p className="text-xs font-mono text-gray-500 mt-1 uppercase tracking-widest">PUNTOS TOTALES</p>
+              <p className="text-xs font-mono text-gray-500 mt-1 uppercase tracking-widest">SATS GANADOS</p>
             </div>
 
             {/* Grade */}
@@ -564,7 +569,7 @@ export function QuizPlayer({ sessionPin }) {
                       <span className="w-5" style={{ color: '#F7931A' }}>{medal}</span>
                       {p.picture && <img src={p.picture} alt="" className="w-4 h-4 rounded-full" onError={e => { e.target.style.display = 'none'; }} />}
                       <span className="flex-1 truncate" style={{ color: isMe ? '#B4F953' : '#F7F7F7' }}>{p.name}{isMe ? ' ◄' : ''}</span>
-                      <span style={{ color: '#F7931A' }}>{p.score} pts</span>
+                      <span style={{ color: '#F7931A' }}>⚡ {p.score} sats</span>
                     </div>
                   );
                 })}
@@ -608,7 +613,7 @@ export function QuizPlayer({ sessionPin }) {
             <span style={{ color: '#B4F953' }}>{playerName}</span>
           </div>
           <span className="text-gray-600">Q{currentQuestionIndex + 1}</span>
-          <span style={{ color: '#F7931A' }}>⚡ {myScore} pts</span>
+          <span style={{ color: '#F7931A' }}>⚡ {myScore} sats</span>
         </div>
 
         {/* Timer */}
@@ -695,7 +700,7 @@ export function QuizPlayer({ sessionPin }) {
                 <p className="font-mono font-bold text-sm" style={{ color: '#FF4444' }}>⏱ TIEMPO AGOTADO</p>
               ) : myAnswers[myAnswers.length - 1]?.correct ? (
                 <p className="font-mono font-bold text-sm" style={{ color: '#B4F953' }}>
-                  ✓ ¡CORRECTO! +{POINTS_PER_CORRECT} pts
+                  ✓ ¡CORRECTO! ⚡ +{POINTS_PER_CORRECT} sats
                 </p>
               ) : (
                 <p className="font-mono font-bold text-sm" style={{ color: '#FF4444' }}>✕ INCORRECTO</p>

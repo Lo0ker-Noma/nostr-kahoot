@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuizStore, shuffleQuiz } from '../store/quizStore';
 import { useAuthStore } from '../store/authStore';
+import { POINTS_PER_CORRECT } from '../store/gameStore';
 
 export function QuizGame({ onBack, initialQuizId, initialQuiz }) {
   const [sessionId, setSessionId] = useState('');
@@ -8,6 +9,7 @@ export function QuizGame({ onBack, initialQuizId, initialQuiz }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [score, setScore] = useState(0);
+  const [sats, setSats] = useState(0);
   const [answered, setAnswered] = useState(false);
   const [gameFinished, setGameFinished] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -40,7 +42,10 @@ export function QuizGame({ onBack, initialQuizId, initialQuiz }) {
     setSelectedAnswer(answerIndex);
     const question = currentQuiz.questions[currentQuestionIndex];
     const isCorrect = answerIndex === question.correct;
-    if (isCorrect) setScore(score + 1);
+    if (isCorrect) {
+      setScore(score + 1);
+      setSats(sats + POINTS_PER_CORRECT);
+    }
     setAnswered(true);
     saveAnswer({ quizId: currentQuiz.id, questionId: question.id, answer: answerIndex, correct: isCorrect, player: user.pubkey });
   };
@@ -88,11 +93,12 @@ export function QuizGame({ onBack, initialQuizId, initialQuiz }) {
           <p className="text-xs font-mono text-gray-500">[ SESSION COMPLETE ]</p>
           <h2 className="text-3xl font-bold font-mono tracking-widest uppercase" style={{ color: '#B4F953', textShadow: '0 0 12px rgba(180,249,83,0.6)' }}>QUIZ TERMINADO</h2>
           <div className="py-8 space-y-2" style={{ border: '1px solid rgba(180,249,83,0.2)', background: 'rgba(180,249,83,0.03)' }}>
-            <p className="text-7xl font-bold font-mono" style={{ color: '#F7931A', textShadow: '0 0 20px rgba(247,147,26,0.6)' }}>{score}/{currentQuiz.questions.length}</p>
-            <p className="text-sm font-mono text-gray-400">{pct}% CORRECTO</p>
+            <p className="text-7xl font-bold font-mono" style={{ color: '#F7931A', textShadow: '0 0 20px rgba(247,147,26,0.6)' }}>⚡ {sats}</p>
+            <p className="text-xs font-mono text-gray-500 uppercase tracking-widest">SATS GANADOS</p>
+            <p className="text-sm font-mono text-gray-400 mt-3">{score}/{currentQuiz.questions.length} · {pct}% CORRECTO</p>
             <p className="text-2xl font-bold font-mono mt-2" style={{ color: '#B4F953' }}>GRADE: {grade}</p>
           </div>
-          <button onClick={() => { setCurrentQuiz(null); setCurrentQuestionIndex(0); setScore(0); setGameFinished(false); onBack(); }} className="w-full py-4 font-mono font-bold text-sm tracking-widest uppercase" style={{ border: '2px solid #B4F953', background: '#0A0A0A', color: '#B4F953' }}>
+          <button onClick={() => { setCurrentQuiz(null); setCurrentQuestionIndex(0); setScore(0); setSats(0); setGameFinished(false); onBack(); }} className="w-full py-4 font-mono font-bold text-sm tracking-widest uppercase" style={{ border: '2px solid #B4F953', background: '#0A0A0A', color: '#B4F953' }}>
             &larr; VOLVER AL DASHBOARD
           </button>
         </div>
@@ -117,7 +123,7 @@ export function QuizGame({ onBack, initialQuizId, initialQuiz }) {
       <div className="space-y-1">
         <div className="flex justify-between items-center text-xs font-mono">
           <span className="text-gray-500">Q {currentQuestionIndex + 1}/{currentQuiz.questions.length}</span>
-          <span style={{ color: '#F7931A' }} className="font-bold">SCORE: {score}</span>
+          <span style={{ color: '#F7931A' }} className="font-bold">⚡ {sats} SATS</span>
         </div>
         <div className="w-full h-1" style={{ background: 'rgba(180,249,83,0.1)' }}>
           <div className="h-full transition-all duration-500" style={{ width: `${progress}%`, background: '#B4F953', boxShadow: '0 0 8px rgba(180,249,83,0.5)' }} />
